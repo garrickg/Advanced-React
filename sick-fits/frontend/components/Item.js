@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import Link from 'next/link';
-import Title from './styles/Title';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+
+import formatMoney from '../lib/formatMoney';
+import DeleteItem from './DeleteItem';
 import ItemStyles from './styles/ItemStyles';
 import PriceTag from './styles/PriceTag';
-import formatMoney from '../lib/formatMoney';
+import Title from './styles/Title';
 
 class Item extends Component {
   render() {
@@ -14,7 +16,7 @@ class Item extends Component {
         {item.image && <img src={item.image} alt={item.title} />}
         <Title>
           <Link href={{
-            pathName: '/item',
+            pathname: '/item',
             query: { id: item.id },
           }}>
             <a>
@@ -32,7 +34,7 @@ class Item extends Component {
             <a>Edit...</a>
           </Link>
           <button>Add To Cart</button>
-          <button>Delete</button>
+          <DeleteItem id={item.id}>Delete Item</DeleteItem>
         </div>
       </ItemStyles>
     );
