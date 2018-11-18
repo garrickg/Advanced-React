@@ -6,9 +6,9 @@ const Mutations = {
     // TODO: Check if user is authed
 
     const item = await context.db.mutation.createItem({
-      data: { ...args }
+      data: { ...args },
     }, info);
-    
+
     return item;
   },
   updateItem(parent, args, context, info) {
@@ -20,14 +20,14 @@ const Mutations = {
     return context.db.mutation.updateItem({
       data: updates,
       where: {
-        id: args.id
-      }
+        id: args.id,
+      },
     }, info);
   },
   async deleteItem(parent, args, context, info) {
     const where = { id: args.id };
     // find the item
-    const item = await context.db.query.item({ where }, `{ id, title }`);
+    const item = await context.db.query.item({ where }, '{ id, title }');
     // TODO: check if they are the owner
     return context.db.mutation.deleteItem({ where }, info);
     // delete it
@@ -54,7 +54,7 @@ const Mutations = {
       maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
     });
     return user;
-  }
+  },
 };
 
 module.exports = Mutations;
