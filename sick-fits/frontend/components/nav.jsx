@@ -1,14 +1,14 @@
 import Link from 'next/link';
+import React from 'react';
 
 import NavStyles from './styles/NavStyles';
-import User from './User';
+import User from './user';
 
 const Nav = () => (
   <NavStyles>
     <User>
       {({ data: { me } }) => {
-        console.log(me);
-        if(me) return <p>{me.name}</p>;
+        if (me) return <p>{me.name}</p>;
         return null;
       }}
     </User>

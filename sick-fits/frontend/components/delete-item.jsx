@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 
-import { ALL_ITEMS_QUERY } from './Items';
+import { ALL_ITEMS_QUERY } from './items';
 
 const DELETE_ITEM_MUTATION = gql`
   mutation DELETE_ITEM_MUTATION($id: ID!) {
@@ -22,19 +22,25 @@ class DeleteItem extends Component {
     // put items back in cache
     cache.writeQuery({ query: ALL_ITEMS_QUERY, data });
   }
+
   render() {
+    const { id, children } = this.props;
     return (
-      <Mutation 
+      <Mutation
         mutation={DELETE_ITEM_MUTATION}
-        variables={{id: this.props.id}}
+        variables={{ id }}
         update={this.update}
       >
         {(deleteItem, { error }) => (
-          <button onClick={() => {
-            if(confirm('Are you sure you want to delete this item?')) {
-              deleteItem();
-            }
-          }}>{this.props.children}</button>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm('Are you sure you want to delete this item?')) {
+                deleteItem();
+              }
+            }}
+          >{children}
+          </button>
         )}
       </Mutation>
     );

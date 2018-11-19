@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import React from 'react';
 
 const Meta = () => (
   <Head>
@@ -8,6 +9,6 @@ const Meta = () => (
     <link rel="stylesheet" type="text/css" href="/static/nprogress.css" />
     <title>Sick Fits</title>
   </Head>
-)
+);
 
 export default Meta;

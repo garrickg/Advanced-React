@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled, { injectGlobal, ThemeProvider } from 'styled-components';
 
-import Header from '../components/Header';
-import Meta from '../components/Meta';
+import Header from './header';
+import Meta from './meta';
 
 const theme = {
   red: '#F00',
@@ -25,6 +25,7 @@ const Inner = styled.div`
   padding: 2rem;
 `;
 
+// eslint-disable-next-line no-unused-expressions
 injectGlobal`
   @font-face {
     font-family: 'radnika_next';
@@ -52,20 +53,16 @@ injectGlobal`
   }
 `;
 
-class Page extends Component {
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <StyledPage>
-          <Meta />
-          <Header />
-          <Inner>
-            {this.props.children}
-          </Inner>
-        </StyledPage>
-      </ThemeProvider>
-    );
-  }
-}
+const Page = ({ children }) => (
+  <ThemeProvider theme={theme}>
+    <StyledPage>
+      <Meta />
+      <Header />
+      <Inner>
+        {children}
+      </Inner>
+    </StyledPage>
+  </ThemeProvider>
+);
 
 export default Page;

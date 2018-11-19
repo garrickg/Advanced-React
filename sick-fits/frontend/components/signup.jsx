@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 
-import Error from './ErrorMessage';
+import Error from './error-message';
 import Form from './styles/Form';
 
 const SIGNUP_MUTATION = gql`
@@ -21,18 +21,21 @@ class Signup extends Component {
     email: '',
     password: '',
   };
+
   saveToState = (e) => {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
+
   render() {
+    const { email, name, password } = this.state;
     return (
       <Mutation mutation={SIGNUP_MUTATION} variables={this.state}>
         {(signup, { error, loading }) => (
           <Form
             method="post"
-            onSubmit={ async e => {
+            onSubmit={async (e) => {
               e.preventDefault();
               await signup();
               this.setState({
@@ -47,30 +50,30 @@ class Signup extends Component {
               <Error error={error} />
               <label htmlFor="email">
                 Email
-                <input 
-                  type="email" 
-                  name="email" 
-                  value={this.state.email} 
+                <input
+                  type="email"
+                  name="email"
+                  value={email}
                   onChange={this.saveToState}
                   required
                 />
               </label>
               <label htmlFor="name">
                 Name
-                <input 
-                  type="text" 
-                  name="name" 
-                  value={this.state.name} 
+                <input
+                  type="text"
+                  name="name"
+                  value={name}
                   onChange={this.saveToState}
                   required
                 />
               </label>
               <label htmlFor="password">
                 Password
-                <input 
-                  type="password" 
-                  name="password" 
-                  value={this.state.password} 
+                <input
+                  type="password"
+                  name="password"
+                  value={password}
                   onChange={this.saveToState}
                   required
                 />
