@@ -5,9 +5,12 @@ const Mutations = {
   async createItem(parent, args, context, info) {
     // TODO: Check if user is authed
 
-    const item = await context.db.mutation.createItem({
-      data: { ...args },
-    }, info);
+    const item = await context.db.mutation.createItem(
+      {
+        data: { ...args },
+      },
+      info,
+    );
 
     return item;
   },
@@ -17,12 +20,15 @@ const Mutations = {
     // remove the ID from the udpates
     delete updates.id;
     // run the update method
-    return context.db.mutation.updateItem({
-      data: updates,
-      where: {
-        id: args.id,
+    return context.db.mutation.updateItem(
+      {
+        data: updates,
+        where: {
+          id: args.id,
+        },
       },
-    }, info);
+      info,
+    );
   },
   async deleteItem(parent, args, context, info) {
     const where = { id: args.id };
@@ -38,14 +44,17 @@ const Mutations = {
     // hash the password
     const password = await bcrypt.hash(args.password, 10);
     // create the user in the database
-    const user = await context.db.mutation.createUser({
-      data: {
-        ...args,
-        email,
-        password,
-        permissions: { set: ['USER'] },
+    const user = await context.db.mutation.createUser(
+      {
+        data: {
+          ...args,
+          email,
+          password,
+          permissions: { set: ['USER'] },
+        },
       },
-    }, info);
+      info,
+    );
     // create the JWT
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
     // set JWT as cookie on the response
