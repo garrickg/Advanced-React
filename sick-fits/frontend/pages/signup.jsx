@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import RequestReset from '../components/request-reset';
+import Signin from '../components/signin';
 import Signup from '../components/signup';
 
 const Columns = styled.div`
@@ -12,8 +14,8 @@ const Columns = styled.div`
 const SignupPage = () => (
   <Columns>
     <Signup />
-    <Signup />
-    <Signup />
+    <Signin />
+    <RequestReset />
   </Columns>
 );
 

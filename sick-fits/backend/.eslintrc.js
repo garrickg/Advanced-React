@@ -1,6 +1,7 @@
 module.exports = {
   extends: "airbnb",
   rules: {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "linebreak-style": 0,
     "unicorn/catch-error-name": [
       "error",
