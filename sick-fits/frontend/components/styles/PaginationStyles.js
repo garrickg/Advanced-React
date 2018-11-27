@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case */
 import styled from 'styled-components';
 
 const PaginationStyles = styled.div`

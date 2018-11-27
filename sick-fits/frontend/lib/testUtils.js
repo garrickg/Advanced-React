@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case */
 import casual from 'casual';
 
 // seed it so we get consistent results

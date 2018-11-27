@@ -1,4 +1,5 @@
-export default function(amount) {
+/* eslint-disable unicorn/filename-case */
+export default function (amount) {
   const options = {
     style: 'currency',
     currency: 'USD',

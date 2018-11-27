@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case */
 export default function calcTotalPrice(cart) {
   return cart.reduce((tally, cartItem) => {
     if (!cartItem.item) return tally;

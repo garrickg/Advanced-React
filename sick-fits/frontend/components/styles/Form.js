@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case */
 import styled, { keyframes } from 'styled-components';
 
 const loading = keyframes`

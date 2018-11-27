@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
 const { promisify } = require('util');
+const { hasPermission } = require('../utils');
 
 const { transport, makeANiceEmail } = require('../mail');
 
@@ -52,10 +53,15 @@ const Mutations = {
   async deleteItem(_parent, { id }, context, info) {
     const where = { id };
     // find the item
-    const item = await context.db.query.item({ where }, '{ id, title }');
-    // TODO: check if they are the owner
-    return context.db.mutation.deleteItem({ where }, info);
+    const item = await context.db.query.item({ where }, '{ id, title, user { id } }');
+    // TODO: check if they are the owner or admin
+    const ownsItem = item.user.id === context.request.userId;
+    const hasPermissions = context.request.user.permissions.some(permission => ['ADMIN', 'ITEMDELETE'].includes(permission));
+    if (!ownsItem && !hasPermissions) {
+      throw new Error('Insufficient permissions!');
+    }
     // delete it
+    return context.db.mutation.deleteItem({ where }, info);
   },
   async signup(_parent, args, context, info) {
     // lowercase the email
@@ -169,6 +175,30 @@ const Mutations = {
     });
     // return the user
     return updatedUser;
+  },
+  async updatePermissions(parent, { permissions, userId: id }, context, info) {
+    const { userId } = context.request;
+    // check if logged in
+    if (!userId) {
+      throw new Error('Please login first!');
+    }
+    // query current user
+    const currentUser = await context.db.query.user({
+      where: {
+        id: userId,
+      },
+    }, info);
+    // check their permissions
+    hasPermission(currentUser, ['ADMIN', 'PERMISSIONUPDATE']);
+    // update the permissions
+    return context.db.mutation.updateUser({
+      data: {
+        permissions: {
+          set: permissions,
+        },
+      },
+      where: { id },
+    }, info);
   },
 };
 
