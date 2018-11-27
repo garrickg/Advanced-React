@@ -200,6 +200,41 @@ const Mutations = {
       where: { id },
     }, info);
   },
+  async addToCart(parent, { id }, context, info) {
+    // check user is signed in
+    const { userId } = context.request;
+    if (!userId) {
+      throw new Error('Please login first!');
+    }
+    // query the user's current cart
+    const [existingCartItem] = await context.db.query.cartItems({
+      where: {
+        AND: {
+          user: { id: userId },
+          item: { id },
+        },
+      },
+    });
+    // check if item is in cart, and increment if it is
+    if (existingCartItem) {
+      console.log('this item is already in their cart');
+      return context.db.mutation.updateCartItem({
+        where: { id: existingCartItem.id },
+        data: { quantity: existingCartItem.quantity + 1 },
+      }, info);
+    }
+    // else create new cartItem for user
+    return context.db.mutation.createCartItem({
+      data: {
+        user: {
+          connect: { id: userId },
+        },
+        item: {
+          connect: { id },
+        },
+      },
+    }, info);
+  },
 };
 
 
