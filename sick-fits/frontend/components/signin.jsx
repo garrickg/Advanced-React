@@ -1,20 +1,10 @@
-import gql from 'graphql-tag';
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 
+import { SIGNIN_MUTATION } from '../resolvers/mutation';
+import { CURRENT_USER_QUERY } from '../resolvers/query';
 import Error from './error-message';
 import Form from './styles/Form';
-import { CURRENT_USER_QUERY } from './user';
-
-const SIGNIN_MUTATION = gql`
-  mutation SIGNIN_MUTATION($email: String!, $password: String!) {
-    signin(email: $email, password: $password) {
-      id
-      email
-      name
-    }
-  }
-`;
 
 class Signin extends Component {
   state = {
@@ -83,4 +73,3 @@ class Signin extends Component {
 }
 
 export default Signin;
-export { SIGNIN_MUTATION };

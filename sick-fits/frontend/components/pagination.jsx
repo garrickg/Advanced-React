@@ -1,22 +1,11 @@
-import gql from 'graphql-tag';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
 import { Query } from 'react-apollo';
 
 import { perPage } from '../config';
+import { PAGINATION_QUERY } from '../resolvers/query';
 import PaginationStyles from './styles/PaginationStyles';
-
-
-const PAGINATION_QUERY = gql`
-  query PAGINATION_QUERY {
-    itemsConnection {
-      aggregate {
-        count
-      }
-    }
-  }
-`;
 
 const Pagination = props => (
   <Query query={PAGINATION_QUERY}>

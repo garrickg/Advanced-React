@@ -1,21 +1,11 @@
-import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 
+import { RESET_MUTATION } from '../resolvers/mutation';
+import { CURRENT_USER_QUERY } from '../resolvers/query';
 import Error from './error-message';
 import Form from './styles/Form';
-import { CURRENT_USER_QUERY } from './user';
-
-const RESET_MUTATION = gql`
-  mutation RESET_MUTATION($resetToken: String!, $password: String!, $confirmPassword: String!) {
-    resetPassword(resetToken: $resetToken, password: $password, confirmPassword: $confirmPassword) {
-      id
-      email
-      name
-    }
-  }
-`;
 
 class Reset extends Component {
   static propTypes = {
@@ -93,4 +83,3 @@ class Reset extends Component {
 }
 
 export default Reset;
-export { RESET_MUTATION };

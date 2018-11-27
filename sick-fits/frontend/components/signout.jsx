@@ -1,16 +1,8 @@
-import gql from 'graphql-tag';
 import React from 'react';
 import { Mutation } from 'react-apollo';
 
-import { CURRENT_USER_QUERY } from './user';
-
-const SIGN_OUT_MUTATION = gql`
-  mutation SIGN_OUT_MUTATION {
-    signout {
-      message
-    }
-  }
-`;
+import { SIGN_OUT_MUTATION } from '../resolvers/mutation';
+import { CURRENT_USER_QUERY } from '../resolvers/query';
 
 const Signout = () => (
   <Mutation

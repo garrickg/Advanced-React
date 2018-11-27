@@ -1,9 +1,9 @@
-import gql from 'graphql-tag';
 import Head from 'next/head';
 import React from 'react';
 import { Query } from 'react-apollo';
 import styled from 'styled-components';
 
+import { SINGLE_ITEM_QUERY } from '../resolvers/query';
 import Error from './error-message';
 
 const SingleItemSytles = styled.div`
@@ -22,18 +22,6 @@ const SingleItemSytles = styled.div`
   .details {
     margin: 3rem;
     font-size: 2rem;
-  }
-`;
-
-const SINGLE_ITEM_QUERY = gql`
-  query SINGLE_ITEM_QUERY($id: ID!) {
-    item(where: { id: $id }) {
-      id
-      title
-      description
-      largeImage
-      price
-    }
   }
 `;
 
