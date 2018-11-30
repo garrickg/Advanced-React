@@ -51,17 +51,17 @@ const Mutations = {
     );
   },
   async deleteItem(_parent, { id }, context, info) {
-    const where = { id };
+    const { user } = context.request;
     // find the item
-    const item = await context.db.query.item({ where }, '{ id, title, user { id } }');
+    const item = await context.db.query.item({ where: { id } }, '{ id, title, user { id } }');
     // TODO: check if they are the owner or admin
     const ownsItem = item.user.id === context.request.userId;
-    const hasPermissions = context.request.user.permissions.some(permission => ['ADMIN', 'ITEMDELETE'].includes(permission));
+    const hasPermissions = hasPermission(user, ['ADMIN', 'ITEMDELETE']);
     if (!ownsItem && !hasPermissions) {
       throw new Error('Insufficient permissions!');
     }
     // delete it
-    return context.db.mutation.deleteItem({ where }, info);
+    return context.db.mutation.deleteItem({ where: { id } }, info);
   },
   async signup(_parent, args, context, info) {
     // lowercase the email
@@ -148,8 +148,10 @@ const Mutations = {
     // check if token expired
     const [user] = await context.db.query.users({
       where: {
-        resetToken,
-        resetTokenExpiry_gte: Date.now(),
+        AND: {
+          resetToken,
+          resetTokenExpiry_gte: Date.now(),
+        },
       },
     });
     if (!user) {
@@ -217,7 +219,6 @@ const Mutations = {
     });
     // check if item is in cart, and increment if it is
     if (existingCartItem) {
-      console.log('this item is already in their cart');
       return context.db.mutation.updateCartItem({
         where: { id: existingCartItem.id },
         data: { quantity: existingCartItem.quantity + 1 },
@@ -234,6 +235,22 @@ const Mutations = {
         },
       },
     }, info);
+  },
+  async removeFromCart(parent, { id }, context, info) {
+    const { userId } = context.request;
+    // find the cart item
+    const cartItem = await context.db.query.cartItem({
+      where: { id },
+    }, '{ id, user { id } }');
+    if (!cartItem) {
+      throw new Error('Item not found');
+    }
+    // make sure it's their cart
+    if (cartItem.user.id !== userId) {
+      throw new Error('You do not have permission');
+    }
+    // delete the cart item
+    return context.db.mutation.deleteCartItem({ where: { id } }, info);
   },
 };
 

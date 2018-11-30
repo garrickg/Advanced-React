@@ -121,6 +121,14 @@ const ADD_TO_CART_MUTATION = gql`
   }
 `;
 
+const REMOVE_FROM_CART_MUTATION = gql`
+  mutation removeFromCart($id: ID!) {
+    removeFromCart(id: $id) {
+      id
+    }
+  }
+`;
+
 export {
   TOGGLE_CART_MUTATION,
   CREATE_ITEM_MUTATION,
@@ -133,4 +141,5 @@ export {
   SIGNUP_MUTATION,
   UPDATE_ITEM_MUTATION,
   ADD_TO_CART_MUTATION,
+  REMOVE_FROM_CART_MUTATION,
 };
