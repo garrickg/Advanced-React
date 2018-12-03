@@ -5,6 +5,7 @@ const { promisify } = require('util');
 const { hasPermission } = require('../utils');
 
 const { transport, makeANiceEmail } = require('../mail');
+const stripe = require('../stripe');
 
 const ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
 
@@ -124,13 +125,13 @@ const Mutations = {
     }
     const resetToken = (await promisify(randomBytes)(20)).toString('hex');
     const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
-    const res = await context.db.mutation.updateUser({
+    await context.db.mutation.updateUser({
       where: { email },
       data: { resetToken, resetTokenExpiry },
     });
     // email reset token
     const { FRONTEND_URL } = process.env;
-    const mailRes = await transport.sendMail({
+    await transport.sendMail({
       from: 'garrickgunn@gmail.com',
       to: user.email,
       subject: 'Password Reset Link',
@@ -148,10 +149,10 @@ const Mutations = {
     // check if token expired
     const [user] = await context.db.query.users({
       where: {
-        AND: {
-          resetToken,
-          resetTokenExpiry_gte: Date.now(),
-        },
+        AND: [
+          { resetToken },
+          { resetTokenExpiry_gte: Date.now() },
+        ],
       },
     });
     if (!user) {
@@ -178,7 +179,7 @@ const Mutations = {
     // return the user
     return updatedUser;
   },
-  async updatePermissions(parent, { permissions, userId: id }, context, info) {
+  async updatePermissions(_parent, { permissions, userId: id }, context, info) {
     const { userId } = context.request;
     // check if logged in
     if (!userId) {
@@ -202,7 +203,7 @@ const Mutations = {
       where: { id },
     }, info);
   },
-  async addToCart(parent, { id }, context, info) {
+  async addToCart(_parent, { id }, context, info) {
     // check user is signed in
     const { userId } = context.request;
     if (!userId) {
@@ -211,10 +212,10 @@ const Mutations = {
     // query the user's current cart
     const [existingCartItem] = await context.db.query.cartItems({
       where: {
-        AND: {
-          user: { id: userId },
-          item: { id },
-        },
+        AND: [
+          { user: { id: userId } },
+          { item: { id } },
+        ],
       },
     });
     // check if item is in cart, and increment if it is
@@ -236,7 +237,7 @@ const Mutations = {
       },
     }, info);
   },
-  async removeFromCart(parent, { id }, context, info) {
+  async removeFromCart(_parent, { id }, context, info) {
     const { userId } = context.request;
     // find the cart item
     const cartItem = await context.db.query.cartItem({
@@ -251,6 +252,52 @@ const Mutations = {
     }
     // delete the cart item
     return context.db.mutation.deleteCartItem({ where: { id } }, info);
+  },
+  async createOrder(_parent, { token }, context, _info) {
+    // query current user and make sure they're signed in
+    const { userId } = context.request;
+    if (!userId) throw new Error('Please sign in to checkout');
+    const user = await context.db.query.user({
+      where: { id: userId },
+    }, '{ id name email cart { id quantity item { title price id description image largeImage } } }');
+    // recalculate the total for the price
+    const amount = user.cart.reduce(
+      (tally, cartItem) => tally + cartItem.item.price * cartItem.quantity, 0,
+    );
+    // create the stripe charge from token
+    const charge = await stripe.charges.create({
+      amount,
+      currency: 'CAD',
+      source: token,
+    });
+    // convert the cartItems to orderItems
+    const orderItems = user.cart.map((cartItem) => {
+      const orderItem = {
+        ...cartItem.item,
+        quantity: cartItem.quantity,
+        user: { connect: { id: userId } },
+      };
+      delete orderItem.id;
+      return orderItem;
+    });
+    // create the order
+    const order = await context.db.mutation.createOrder({
+      data: {
+        items: { create: orderItems },
+        total: charge.amount,
+        user: { connect: { id: userId } },
+        charge: charge.id,
+      },
+    });
+    // clear the user's cart, delete cartItems
+    const cartItemIds = user.cart.map(({ id }) => id);
+    await context.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cartItemIds,
+      },
+    });
+    // return the order to the client
+    return order;
   },
 };
 

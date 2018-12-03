@@ -122,9 +122,23 @@ const ADD_TO_CART_MUTATION = gql`
 `;
 
 const REMOVE_FROM_CART_MUTATION = gql`
-  mutation removeFromCart($id: ID!) {
+  mutation REMOVE_FROM_CART_MUTATION($id: ID!) {
     removeFromCart(id: $id) {
       id
+    }
+  }
+`;
+
+const CREATE_ORDER_MUTATION = gql`
+  mutation CREATE_ORDER_MUTATION($token: String!) {
+    createOrder(token: $token) {
+      id
+      charge
+      total
+      items {
+        id
+        title
+      }
     }
   }
 `;
@@ -142,4 +156,5 @@ export {
   UPDATE_ITEM_MUTATION,
   ADD_TO_CART_MUTATION,
   REMOVE_FROM_CART_MUTATION,
+  CREATE_ORDER_MUTATION,
 };

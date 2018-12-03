@@ -27,6 +27,36 @@ const Query = {
     // query all users
     return context.db.query.users({}, info);
   },
+  async order(parent, { id }, context, info) {
+    const { userId, user: { permissions } } = context.request;
+    // check if they are logged in
+    if (!userId) {
+      throw new Error('Please login!');
+    }
+    // query order
+    const order = await context.db.query.order({
+      where: { id },
+    }, info);
+    // check if they have permissions to view order
+    const ownsOrder = order.user.id === userId;
+    const hasPermissionToViewOrder = permissions.includes('ADMIN');
+    if (!ownsOrder || !hasPermissionToViewOrder) {
+      throw new Error('Access Denied!');
+    }
+    // return the order
+    return order;
+  },
+  async orders(parent, args, context, info) {
+    const { userId } = context.request;
+    if (!userId) {
+      throw new Error('Please log in!');
+    }
+    return context.db.query.orders({
+      where: {
+        user: { id: userId },
+      },
+    }, info);
+  },
 };
 
 module.exports = Query;
