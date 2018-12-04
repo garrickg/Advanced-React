@@ -61,5 +61,13 @@ module.exports = {
     "unicorn/no-unsafe-regex": "off",
     "unicorn/prefer-add-event-listener": "error"
   },
-  plugins: ["graphql", "unicorn"]
+  plugins: ["graphql", "unicorn"],
+  overrides: [{
+    files: ["*.test.js"],
+    rules: {
+      "react/react-in-jsx-scope": 0,
+      "react/jsx-filename-extension": 0,
+      "no-console": 0
+    }
+  }]
 };
