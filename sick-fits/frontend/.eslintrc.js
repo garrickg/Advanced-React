@@ -6,7 +6,8 @@ module.exports = {
   },
   env: {
     "browser": true,
-    "node": true
+    "node": true,
+    "jest": true,
   },
   rules: {
     "linebreak-style": 0,
