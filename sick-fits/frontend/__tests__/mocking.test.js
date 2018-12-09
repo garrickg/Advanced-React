@@ -3,8 +3,9 @@ function Person(name, foods) {
   this.foods = foods;
 }
 
+// eslint-disable-next-line func-names
 Person.prototype.fetchFavFoods = function () {
-  return new Promise((res, rej) => {
+  return new Promise((res) => {
     setTimeout(() => res(this.foods), 2000);
   });
 };
