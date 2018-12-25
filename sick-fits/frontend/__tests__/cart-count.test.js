@@ -1,4 +1,4 @@
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 import toJSON from 'enzyme-to-json';
 
 import CartCount from '../components/cart-count';
