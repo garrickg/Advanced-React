@@ -8,8 +8,8 @@ import Form from './styles/Form';
 
 class Signup extends Component {
   state = {
-    name: '',
     email: '',
+    name: '',
     password: '',
   };
 
@@ -31,6 +31,7 @@ class Signup extends Component {
       >
         {(signup, { error, loading }) => (
           <Form
+            data-test="form"
             method="post"
             onSubmit={async (e) => {
               e.preventDefault();
