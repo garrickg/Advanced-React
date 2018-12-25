@@ -1,0 +1,87 @@
+import { mount } from 'enzyme';
+import toJSON from 'enzyme-to-json';
+import Router from 'next/router';
+import NProgress from 'nprogress';
+import { MockedProvider } from 'react-apollo/test-utils';
+import wait from 'waait';
+
+import TakeMyMoney, { onToken } from '../components/take-my-money';
+import { fakeCartItem, fakeUser } from '../lib/testUtils';
+import { CURRENT_USER_QUERY } from '../resolvers/query';
+
+Router.router = { push() { } };
+
+const mocks = [
+  {
+    request: { query: CURRENT_USER_QUERY },
+    result: {
+      data: {
+        me: {
+          ...fakeUser(),
+          cart: [fakeCartItem({ id: 'abc123' })],
+        },
+      },
+    },
+  },
+];
+
+describe('<TakeMyMoney />', () => {
+  it('renders and matches snapshot', async () => {
+    const wrapper = mount(
+      <MockedProvider mocks={mocks}>
+        <TakeMyMoney />
+      </MockedProvider>
+    );
+    await wait();
+    wrapper.update();
+    const checkoutButton = wrapper.find('ReactStripeCheckout');
+    expect(toJSON(checkoutButton)).toMatchSnapshot();
+  });
+  it('creates an order ontoken', async () => {
+    const createOrderMock = jest.fn().mockResolvedValue({
+      data: { createOrder: { id: 'xyz789' } },
+    });
+    const wrapper = mount(
+      <MockedProvider mocks={mocks}>
+        <TakeMyMoney />
+      </MockedProvider>
+    );
+    await wait();
+    wrapper.update();
+    onToken({ id: 'abc123' }, createOrderMock, () => { });
+    expect(createOrderMock).toHaveBeenCalled();
+    expect(createOrderMock).toHaveBeenCalledWith({ variables: { token: 'abc123' } });
+  });
+  it('turns the progress bar on', async () => {
+    const createOrderMock = jest.fn().mockResolvedValue({
+      data: { createOrder: { id: 'xyz789' } },
+    });
+    const wrapper = mount(
+      <MockedProvider mocks={mocks}>
+        <TakeMyMoney />
+      </MockedProvider>
+    );
+    await wait();
+    wrapper.update();
+    NProgress.start = jest.fn();
+    onToken({ id: 'abc123' }, createOrderMock, () => { });
+    expect(NProgress.start).toHaveBeenCalled();
+  });
+  it('routes to the order page when completed', async () => {
+    const wrapper = mount(
+      <MockedProvider mocks={mocks}>
+        <TakeMyMoney />
+      </MockedProvider>
+    );
+    await wait();
+    wrapper.update();
+    const createOrderMock = jest.fn().mockResolvedValue({
+      data: { createOrder: { id: 'xyz789' } },
+    });
+    Router.router.push = jest.fn();
+    onToken({ id: 'abc123' }, createOrderMock, () => { });
+    await wait();
+    expect(Router.router.push).toHaveBeenCalled();
+    expect(Router.router.push).toHaveBeenCalledWith({ pathname: '/order', query: { id: 'xyz789' } });
+  });
+});

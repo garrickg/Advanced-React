@@ -42,21 +42,26 @@ const Composed = adopt({
 
 const TakeMyMoney = props => (
   <Composed>
-    {({ user: { data: { me } }, toggleCart, createOrder }) => (
-      <StripeCheckout
-        amount={calcTotalPrice(me.cart)}
-        name="Sick Fits"
-        description={`Order of ${totalItems(me.cart)} items`}
-        image={me.cart.length && me.cart[0].item && me.cart[0].item.image}
-        stripeKey="pk_test_JRjVGOhlE1o13VeatEYL5vTb"
-        currency="CAD"
-        email={me.email}
-        token={res => onToken(res, createOrder, toggleCart)}
-      >
-        {props.children}
-      </StripeCheckout>
-    )}
+    {({ user: { data: { me }, loading }, toggleCart, createOrder }) => {
+      if (loading) return null;
+      return (
+        <StripeCheckout
+          amount={calcTotalPrice(me.cart)}
+          name="Sick Fits"
+          description={`Order of ${totalItems(me.cart)} items`}
+          image={me.cart.length && me.cart[0].item && me.cart[0].item.image}
+          stripeKey="pk_test_JRjVGOhlE1o13VeatEYL5vTb"
+          currency="CAD"
+          email={me.email}
+          token={res => onToken(res, createOrder, toggleCart)}
+        >
+          {props.children}
+        </StripeCheckout>
+      );
+    }
+    }
   </Composed>
 );
 
 export default TakeMyMoney;
+export { onToken };
